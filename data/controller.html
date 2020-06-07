@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="default.css">
+        <style>
+            body {
+                text-align: initial;
+                font-size: larger;
+                vertical-align: initial;
+            }
+        </style>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            var socket = io();
+            socket.emit("join contoller");
+            $( document ).ready(function() {
+                $.get("/list-files", function(data) {
+                    var fileName;
+                    for (var fileName of data) {
+                        $( "#file-list" ).append(`<li><a href='javascript:showLyrics("${fileName}")'>${fileName}</a></li>`);
+                    }
+                });
+            });
+
+            var currentFileName;
+
+            function showLyrics(fileName) {
+                currentFileName = fileName;
+                $( "#lyrics" ).empty();
+                $.get(`/get-file?file=${fileName}`, function(data) {
+                    data.forEach(function(paragraph, paragraphNumber) {
+                        $( "#lyrics" ).append(`<p><a href='javascript:emitLyrics(${paragraphNumber})'>${paragraph}</a></p>`);
+                    });
+                });
+            }
+
+            function emitLyrics(paragraphNumber) {
+                socket.emit("set server lyrics", {"file": currentFileName, "paragraph": paragraphNumber});
+            }
+        </script>
+    </head>
+    <body>
+        <ul id="file-list"></ul>
+        <hr>
+        <p id="lyrics"></p>
+    </body>
+</html>
