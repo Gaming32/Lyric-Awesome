@@ -1,6 +1,6 @@
+import html
 import os
 import sys
-import html
 import threading
 
 import flask
@@ -74,6 +74,10 @@ def get_file():
 
 
 def ensure_dirs():
+    if not os.path.exists('./config/display'):
+        import shutil
+        os.makedirs('./config/display')
+        shutil.copy('data/default.css', './config/display/default.css')
     if not os.path.exists('./config/lyrics'):
         os.makedirs('./config/lyrics')
     if not os.path.exists('./config/backgrounds'):
