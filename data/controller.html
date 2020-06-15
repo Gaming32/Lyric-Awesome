@@ -37,7 +37,9 @@
             }
 
             function emitLyrics(paragraphNumber) {
+                $( "#lyrics" ).children()[currentLyric].firstChild.className = "";
                 currentLyric = paragraphNumber;
+                $( "#lyrics" ).children()[currentLyric].firstChild.className = "selected";
                 socket.emit("set server lyrics", {"file": currentFileName, "paragraph": paragraphNumber});
             }
 
