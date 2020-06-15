@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="default.css">
+        <link rel="stylesheet" href="styles/default.css">
         <style>
             body {
                 text-align: initial;
@@ -24,6 +24,7 @@
             });
 
             var currentFileName;
+            var currentLyric = 0;
 
             function showLyrics(fileName) {
                 currentFileName = fileName;
@@ -36,11 +37,25 @@
             }
 
             function emitLyrics(paragraphNumber) {
+                currentLyric = paragraphNumber;
                 socket.emit("set server lyrics", {"file": currentFileName, "paragraph": paragraphNumber});
             }
 
             function clearLyrics() {
                 socket.emit("clear lyrics");
+            }
+
+            const allowedKeyCodes = {37: true, 39: true};
+            document.onkeydown = function(e) {
+                var event = window.event ? window.event : e;
+                console.log(event);
+                if (event.keyCode in allowedKeyCodes) {
+                    var direction = event.keyCode - 38;
+                    console.log(direction);
+                    var newLyric = (currentLyric + direction) % $( "#lyrics" ).children().length;
+                    console.log(newLyric);
+                    emitLyrics(newLyric);
+                }
             }
         </script>
     </head>

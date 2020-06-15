@@ -5,7 +5,7 @@ body {
 }
 
 #lyric {
-    font-size: xx-large;
+    font-size: 72pt;
     text-align: center;
     margin: 0;
     position: absolute;
@@ -20,6 +20,6 @@ a {
     text-decoration: none;
 }
 
-a:hover {
+a:hover, a.selected {
     color: teal;
 }
