@@ -13,11 +13,21 @@ app = Flask('lyrics')
 socketio = SocketIO(app)
 
 
+if hasattr(sys, '_MEIPASS'):
+    root_dir = sys._MEIPASS
+else:
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+def get_data_file(rel):
+    return os.path.join(root_dir, 'data', rel)
+
+
 cached_lyrics = {}
+lyrics_mutex = threading.Lock()
 
 
 def get_lyrics(file):
     file = str(file)
+
     if file not in cached_lyrics:
         physical_file = os.path.join('.', 'config', 'lyrics', file + '.txt')
         if os.path.isfile(physical_file):
@@ -28,10 +38,14 @@ def get_lyrics(file):
                         lyrics.append('')
                     else:
                         lyrics[-1] += line
-                cached_lyrics[file] = lyrics
+                with lyrics_mutex:
+                    cached_lyrics[file] = lyrics
         else:
             return []
-    return cached_lyrics[file]
+
+    with lyrics_mutex:
+        lyric_list = cached_lyrics[file]
+    return lyric_list
 
 
 def get_lyric(file, paragraph):
@@ -39,7 +53,8 @@ def get_lyric(file, paragraph):
 
 
 def clear_lyrics_cache():
-    cached_lyrics = {}
+    with lyrics_mutex:
+        cached_lyrics = {}
 
 
 @socketio.on('join controller')
@@ -74,31 +89,32 @@ def get_file():
 
 
 def ensure_dirs():
-    if not os.path.exists('./config/display'):
+    if not os.path.exists('./config/styles'):
         import shutil
-        os.makedirs('./config/display')
-        shutil.copy('data/default.css', './config/display/default.css')
+        os.makedirs('./config/styles')
+        shutil.copy(get_data_file('default.css'), './config/styles/default.css')
     if not os.path.exists('./config/lyrics'):
         os.makedirs('./config/lyrics')
     if not os.path.exists('./config/backgrounds'):
         os.makedirs('./config/backgrounds')
 
 
-@app.route('/default.css')
-def stylesheet():
-    if os.path.isfile('./config/display/default.css'):
-        return flask.send_file('./config/display/default.css')
+@app.route('/styles/<fname>.css')
+def stylesheet(fname):
+    path = './config/styles/%s.css' % fname
+    if os.path.isfile(path):
+        return flask.send_file(path)
     return ''
 
 
 @app.route('/')
 def client():
-    return flask.send_file('data/client.html')
+    return flask.send_file(get_data_file('client.html'))
 
 
 @app.route('/controller')
 def controller():
-    return flask.send_file('data/controller.html')
+    return flask.send_file(get_data_file('controller.html'))
 
 
 def main(have_launcher=True):
