@@ -38,10 +38,15 @@
             function emitLyrics(paragraphNumber) {
                 socket.emit("set server lyrics", {"file": currentFileName, "paragraph": paragraphNumber});
             }
+
+            function clearLyrics() {
+                socket.emit("clear lyrics");
+            }
         </script>
     </head>
     <body>
         <ul id="file-list"></ul>
+        <a href="javascript:clearLyrics()">Clear Lyrics</a>
         <hr>
         <p id="lyrics"></p>
     </body>

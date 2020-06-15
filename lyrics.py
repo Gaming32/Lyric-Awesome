@@ -75,6 +75,11 @@ def on_set_lyrics(json):
     emit('set client lyrics', text, room='client')
 
 
+@socketio.on('clear lyrics')
+def on_set_lyrics():
+    emit('set client lyrics', '', room='client')
+
+
 @app.route('/list-files')
 def list_files():
     return flask.jsonify([html.escape(os.path.splitext(f)[0])
