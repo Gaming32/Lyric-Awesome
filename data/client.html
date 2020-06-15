@@ -9,7 +9,7 @@
             socket.emit("join");
             socket.on("set client lyrics", function(data) {
                 $( "#lyric" ).empty();
-                $( "#lyric" ).append(data.text);
+                $( "#lyric" ).append(data);
             });
         </script>
     </head>

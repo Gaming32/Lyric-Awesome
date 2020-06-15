@@ -31,15 +31,15 @@ def get_lyrics(file):
     if file not in cached_lyrics:
         physical_file = os.path.join('.', 'config', 'lyrics', file + '.txt')
         if os.path.isfile(physical_file):
+            lyrics = ['']
             with open(physical_file) as fp:
-                lyrics = ['']
                 for line in fp:
                     if not line.strip() and lyrics[-1]:
                         lyrics.append('')
                     else:
-                        lyrics[-1] += line
-                with lyrics_mutex:
-                    cached_lyrics[file] = lyrics
+                        lyrics[-1] += html.escape(line).replace('\n', '<br>')
+            with lyrics_mutex:
+                cached_lyrics[file] = lyrics
         else:
             return []
 
@@ -72,8 +72,7 @@ def on_set_lyrics(json):
     file = json['file']
     paragraph = json['paragraph']
     text = get_lyric(file, paragraph)
-    text = html.escape(text)
-    emit('set client lyrics', {'text': text}, room='client')
+    emit('set client lyrics', text, room='client')
 
 
 @app.route('/list-files')
@@ -85,7 +84,7 @@ def list_files():
 @app.route('/get-file', methods=['GET', 'POST'])
 def get_file():
     file = request.args.get('file')
-    return flask.jsonify([html.escape(p) for p in get_lyrics(file)])
+    return flask.jsonify(get_lyrics(file))
 
 
 def ensure_dirs():
