@@ -86,6 +86,12 @@ def list_files():
                           for f in os.listdir('./config/lyrics')])
 
 
+@app.route('/list-styles')
+def list_styles():
+    return flask.jsonify([html.escape(f)
+                          for f in os.listdir('./config/styles')])
+
+
 @app.route('/get-file', methods=['GET', 'POST'])
 def get_file():
     file = request.args.get('file')
@@ -97,6 +103,7 @@ def ensure_dirs():
         import shutil
         os.makedirs('./config/styles')
         shutil.copy(get_data_file('default.css'), './config/styles/default.css')
+        # shutil.copy(get_data_file('bottom.css'), './config/styles/bottom.css')
     if not os.path.exists('./config/lyrics'):
         os.makedirs('./config/lyrics')
     if not os.path.exists('./config/backgrounds'):
@@ -122,8 +129,22 @@ def controller():
 
 
 def main(have_launcher=True):
+    def bind_addr_type(value:str):
+        if ':' in value:
+            res = value.rsplit(':', 1)
+        else:
+            res = value, 59742
+        return res[0], int(res[1])
+
+    import argparse
+    parser = argparse.ArgumentParser(description='Renders lyrics on screen')
+    parser.add_argument('bind_addr', metavar='HOST:PORT', nargs='?',
+        default='127.0.0.1:59742', type=bind_addr_type)
+    parser.add_argument('--no-launcher', dest='have_launcher', action='store_false')
+    args = parser.parse_args()
+
     ensure_dirs()
-    if have_launcher:
+    if args.have_launcher:
         launcher_thread = threading.Thread(target=run_launcher,
                                            kwargs={
                                                'interrupt_main': True,
@@ -131,7 +152,7 @@ def main(have_launcher=True):
                                            },
                                            daemon=True)
         launcher_thread.start()
-    socketio.run(app, port=59742)
+    socketio.run(app, host=args.bind_addr[0], port=args.bind_addr[1])
 
 
 if __name__ == '__main__':
