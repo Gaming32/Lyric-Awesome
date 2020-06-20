@@ -1,0 +1,14 @@
+body {
+    background-color: black;
+    color: white;
+    vertical-align: bottom;
+}
+
+#lyric {
+    font-size: xx-large;
+    text-align: center;
+    margin: 0;
+    position: absolute;
+    margin-right: -50%;
+    transform: translate(-50%, 100%) translate(0, -1.5em);
+}

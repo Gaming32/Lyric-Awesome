@@ -5,7 +5,7 @@ body {
 }
 
 #lyric {
-    font-size: 72pt;
+    font-size: 54pt;
     text-align: center;
     margin: 0;
     position: absolute;
@@ -22,4 +22,32 @@ a {
 
 a:hover, a.selected {
     color: teal;
+}
+
+button {
+    font-size: medium;
+    width: 90%;
+    transform: translate(50%);
+    height: 67.5%;
+    color: white;
+    background-color: black;
+    border-color: gray;
+    border-width: 1px;
+    border-style: solid;
+}
+
+/* button {
+    background-color: black;
+    border: none;
+    color: white;
+    padding: 85% 85%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+  } */
+
+button.selected {
+    border-color: white;
+    border-width: 2px;
 }

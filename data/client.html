@@ -11,6 +11,9 @@
                 $( "#lyric" ).empty();
                 $( "#lyric" ).append(data);
             });
+            socket.on("set client style", function(data) {
+                $( "head" ).append(`<link rel="stylesheet" href="styles/${data}">`)
+            });
         </script>
     </head>
     <body>

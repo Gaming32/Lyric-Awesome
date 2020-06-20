@@ -80,6 +80,11 @@ def on_set_lyrics():
     emit('set client lyrics', '', room='client')
 
 
+@socketio.on('set server style')
+def on_set_lyrics(file):
+    emit('set client style', file, room='client')
+
+
 @app.route('/list-files')
 def list_files():
     return flask.jsonify([html.escape(os.path.splitext(f)[0])
@@ -103,7 +108,7 @@ def ensure_dirs():
         import shutil
         os.makedirs('./config/styles')
         shutil.copy(get_data_file('default.css'), './config/styles/default.css')
-        # shutil.copy(get_data_file('bottom.css'), './config/styles/bottom.css')
+        shutil.copy(get_data_file('bottom.css'), './config/styles/bottom.css')
     if not os.path.exists('./config/lyrics'):
         os.makedirs('./config/lyrics')
     if not os.path.exists('./config/backgrounds'):

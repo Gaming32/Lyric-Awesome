@@ -16,15 +16,25 @@
             socket.emit("join contoller");
             $( document ).ready(function() {
                 $.get("/list-files", function(data) {
-                    var fileName;
                     for (var fileName of data) {
                         $( "#file-list" ).append(`<li><a href='javascript:showLyrics("${fileName}")'>${fileName}</a></li>`);
+                    }
+                });
+                $.get("/list-styles", function(data) {
+                    for (var fileName of data) {
+                        var className = fileName == "default.css" ? "selected" : "";
+                        $( "#style-list" ).append(`<button
+                            id='style-button-${fileName.split(".", 1)[0]}'
+                            class='${className}'
+                            onclick='emitStyle("${fileName}")'
+                        >${fileName}</button>`);
                     }
                 });
             });
 
             var currentFileName;
             var currentLyric = 0;
+            var currentStyle = "default";
 
             function showLyrics(fileName) {
                 currentFileName = fileName;
@@ -41,6 +51,15 @@
                 currentLyric = paragraphNumber;
                 $( "#lyrics" ).children()[currentLyric].firstChild.className = "selected";
                 socket.emit("set server lyrics", {"file": currentFileName, "paragraph": paragraphNumber});
+            }
+
+            function emitStyle(fileName) {
+                var shortName = fileName.split(".", 1)[0];
+                $( `#style-button-${currentStyle}` ).className = "";
+                var btn = $( `#style-button-${shortName}` );
+                btn.className = "selected";
+                currentStyle = shortName;
+                socket.emit("set server style", fileName);
             }
 
             function clearLyrics() {
@@ -62,9 +81,19 @@
         </script>
     </head>
     <body>
-        <ul id="file-list"></ul>
-        <a href="javascript:clearLyrics()">Clear Lyrics</a>
-        <hr>
-        <p id="lyrics"></p>
+        <table style="width: 100%">
+            <tr>
+                <td style="width: 70%">
+                    <ul id="file-list"></ul>
+                    <a href="javascript:clearLyrics()">Clear Lyrics</a>
+                    <hr>
+                    <p id="lyrics"></p>
+                </td>
+                <td id="style-list" style="width: 15%">
+                </td>
+                <td style="width: 15%">
+                </td>
+            </tr>
+        </table>
     </body>
 </html>
